@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-
-const socket = io("https://chat-bot-backend-0f3q.onrender.com"); // Connect to the backend
+import "./App.css"; // Importing the CSS file
+import Button from '@mui/material/Button';
+const socket = io("http://localhost:3000");
 
 function App() {
   const [username, setUsername] = useState("");
@@ -11,100 +12,132 @@ function App() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
 
-  useEffect(() => {
-    socket.on("online_users", (users) => {
-      setOnlineUsers(users);
-    });
-
-    socket.on("private_message", ({ sender, message }) => {
-      setMessages((prev) => [...prev, { sender, message }]);
-    });
-
-    return () => {
-      socket.off("online_users");
-      socket.off("private_message");
-    };
-  }, []);
-
-  const register = () => {
-    if (username) {
+  const registerUser = () => {
+    if (username.trim()) {
       socket.emit("register", username);
       setRegistered(true);
     }
   };
 
+  useEffect(() => {
+    socket.on("private_message", ({ sender, message }) => {
+      setMessages((prev) => [...prev, { sender, message }]);
+    });
+
+    socket.on("online_users", (users) => {
+      setOnlineUsers(users.filter((user) => user !== username));
+    });
+
+    return () => {
+      socket.off("private_message");
+      socket.off("online_users");
+    };
+  }, [username]);
+
+  useEffect(() => {
+    if (recipient) {
+      socket.emit("get_chat_history", { user1: username, user2: recipient });
+
+      socket.on("chat_history", (history) => {
+        setMessages(
+          history.map((msg) => ({
+            sender: msg.sender,
+            message: msg.content,
+            timestamp: msg.timestamp,
+          }))
+        );
+      });
+
+      return () => socket.off("chat_history");
+    }
+  }, [recipient, username]);
+
   const sendMessage = () => {
-    if (recipient && message) {
-      socket.emit("private_message", { sender: username, recipient, message });
+    if (message.trim() && recipient) {
+      socket.emit("private_message", {
+        sender: username,
+        recipient,
+        message,
+      });
+
       setMessages((prev) => [...prev, { sender: "You", message }]);
-      setMessage(""); 
+      setMessage("");
     }
   };
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
+    <div className="app">
       {!registered ? (
-        <div>
-          <h1>Register</h1>
+        <div className="register">
+          <h2>Register</h2>
           <input
             type="text"
+            placeholder="Enter your username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter your username"
-            style={{ padding: "10px", width: "100%", marginBottom: "10px" }}
+            className="input"
           />
-          <button onClick={register} style={{ padding: "10px", width: "100%" }}>
+          <button onClick={registerUser} className="btn">
             Register
           </button>
         </div>
       ) : (
-        <div>
-          <h1>Welcome, {username}</h1>
-          <div>
-            <h2>Online Users</h2>
-            <select
-              onChange={(e) => setRecipient(e.target.value)}
-              value={recipient}
-              style={{ padding: "10px", width: "100%", marginBottom: "10px" }}
-            >
-              <option value="">Select a recipient</option>
-              {onlineUsers.map((user) => (
-                <option key={user} value={user}>
-                  {user}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <h2>Chat</h2>
-            <div
-              style={{
-                border: "1px solid #ccc",
-                height: "200px",
-                overflowY: "scroll",
-                padding: "10px",
-                marginBottom: "10px",
-              }}
-            >
-              {messages.map((msg, index) => (
-                <p key={index}>
-                  <strong>{msg.sender}:</strong> {msg.message}
-                </p>
-              ))}
+        <div className="chat-container">
+          <h2>Welcome, {username}</h2>
+          <div className="main">
+            <div className="online-users">
+              <h3>Online Users</h3>
+              <ul>
+                {onlineUsers.map((user) => (
+                  <li
+                    key={user}
+                    className={`user ${user === recipient ? "selected" : ""}`}
+                    onClick={() => setRecipient(user)}
+                  >
+                    <Button variant="outlined">{user}</Button>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type a message"
-              style={{ padding: "10px", width: "80%", marginRight: "10px" }}
-            />
-            <button
-              onClick={sendMessage}
-              style={{ padding: "10px", backgroundColor: "#007bff", color: "white" }}
-            >
-              Send
-            </button>
+
+            <div className="chat">
+              {recipient && (
+                <>
+                  <h3>Chat with {recipient}</h3>
+                  <div className="messages">
+                    {messages.map((msg, index) => (
+                      <div
+                        key={index}
+                        className={`message ${
+                          msg.sender === "You" ? "sent" : "received"
+                        }`}
+                      >
+                        <p>
+                          <strong>{msg.sender}:</strong> {msg.message}
+                        </p>
+                        {msg.timestamp && (
+                          <small>
+                            {new Date(msg.timestamp).toLocaleTimeString()}
+                          </small>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="input-container">
+                    <input
+                      type="text"
+                      placeholder="Type your message..."
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      className="input"
+                    />
+                    <button onClick={sendMessage} className="btn send-btn">
+                      Send
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
