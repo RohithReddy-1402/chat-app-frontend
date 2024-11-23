@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import "./App.css"; // Importing the CSS file
+import "./App.css";
 import Button from '@mui/material/Button';
-const socket = io("https://chat-bot-backend-0f3q.onrender.com");
+const socket = io("http://localhost:3000");
 
 function App() {
   const [username, setUsername] = useState("");
@@ -82,10 +82,10 @@ function App() {
           </button>
         </div>
       ) : (
-        <div className="chat-container">
-          <h2>Welcome, {username}</h2>
+        <div className="chat-container ">
+          <h2 className="">Welcome, {username}</h2>
           <div className="main">
-            <div className="online-users">
+            <div className="online-users absolute left-0 " style={{width:"300px"}}>
               <h3>Online Users</h3>
               <ul>
                 {onlineUsers.map((user) => (
@@ -100,17 +100,18 @@ function App() {
               </ul>
             </div>
 
-            <div className="chat">
+            <div className="chat right-0">
               {recipient && (
                 <>
-                  <h3>Chat with {recipient}</h3>
-                  <div className="messages">
+                  <h3 style={{border:"2px solid red",width:"900px",height:"40px"}}  >Chat with {recipient}</h3>
+                  <div className="messages absolute my-3" style={{right:"400px",border:"3px solid red",width:"900px",left:"464px"}}>
                     {messages.map((msg, index) => (
                       <div
                         key={index}
                         className={`message ${
                           msg.sender === "You" ? "sent" : "received"
                         }`}
+                        
                       >
                         <p>
                           <strong>{msg.sender}:</strong> {msg.message}
@@ -123,7 +124,7 @@ function App() {
                       </div>
                     ))}
                   </div>
-                  <div className="input-container">
+                  <div className="input-container absolute bottom-0" style={{width:"800px"}}>
                     <input
                       type="text"
                       placeholder="Type your message..."
