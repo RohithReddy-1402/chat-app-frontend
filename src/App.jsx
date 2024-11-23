@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import "./App.css";
 import Button from '@mui/material/Button';
-const socket = io("http://localhost:3000");
+const socket = io("https://chat-bot-backend-0f3q.onrender.com");
 
 function App() {
   const [username, setUsername] = useState("");
