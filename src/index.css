@@ -2,80 +2,80 @@
 @tailwind components;
 @tailwind utilities;
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
-  color: #333;
-}
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+    backdrop-filter: blur(5px);
+  }
+  
+  .app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10rem;
+    backdrop-filter:30px;
 
-.app {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-}
+  }
 
-.register, .chat-container {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-h2 {
-  text-align: center;
-  color: #444;
-}
-
-.input {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.btn {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  text-align: center;
-}
-
-.btn:hover {
-  background-color: #0056b3;
-}
-
-.chat-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.main {
-  display: flex;
-  gap: 20px;
-}
-
-.online-users {
-  flex: 1;
-  background: white;
-  padding: 15px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-}
-
-.online-users ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.online-users li {
-  padding: 10px;
-  margin-bottom: 5px;
-  cursor: pointer
-}
+  .register-container,
+  .chat-container {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  .chat-container:hover{
+    box-shadow: 0px 0px  30px 0.3rem black;
+  }
+  .chat-layout {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+  
+  .online-users {
+    flex: 1;
+    max-width: 300px;
+  }
+  
+  .online-users ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .chat-section {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .messages-container {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 400px;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #f7f7f7;
+  }
+  
+  .message {
+    margin-bottom: 1rem;
+  }
+  
+  .message.sent {
+    text-align: right;
+    color: #4caf50;
+  }
+  
+  .message.received {
+    text-align: left;
+    color: #2196f3;
+  }
+  
+  .input-container {
+    display: flex;
+    align-items: center;
+  }
+  
